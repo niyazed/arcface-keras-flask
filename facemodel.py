@@ -15,8 +15,6 @@ from sklearn.externals import joblib
 
 import archs
 from metrics import *
-from scheduler import *
-
 
 
 BATCH_SIZE = 128
