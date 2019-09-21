@@ -22,7 +22,7 @@ import keras
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential, load_model
 from keras.layers import Dense, Dropout, Activation, Flatten, BatchNormalization
-from keras.layers import Conv2D, MaxPooling2D, Input
+from keras.layers import Conv2D, MaxPooling2D, Input, GlobalAveragePooling2D
 from keras.optimizers import SGD, Adam
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, CSVLogger, LearningRateScheduler, TerminateOnNaN, LambdaCallback
 from keras import Model, optimizers
@@ -37,8 +37,8 @@ from mpl_toolkits.mplot3d import Axes3D
 
 
 
-BATCH_SIZE = 128
-EPOCHS = 1000
+BATCH_SIZE = 64
+EPOCHS = 5000
 IMG_W = 128
 IMG_H = 128
 IMG_CHNL = 3
@@ -49,7 +49,7 @@ WEIGHT_DECAY = 1e-3
 
 
 def load_data():
-    X = np.load('data/color_image.npy',allow_pickle=True)
+    X = np.load('data/128x128x3_image.npy',allow_pickle=True)
     y = np.load('data/label.npy',allow_pickle=True)
 
     le = preprocessing.LabelEncoder()
@@ -91,19 +91,25 @@ def build_model():
     input = Input(shape=(IMG_W, IMG_H, IMG_CHNL))
     label = Input(shape=(NUM_CLASSES,))
 
-    x = Conv2D(16, kernel_size=(3, 3), activation='relu', kernel_regularizer=regularizers.l2(WEIGHT_DECAY))(input)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-    x = Conv2D(32, kernel_size=(3, 3), activation='relu', kernel_regularizer=regularizers.l2(WEIGHT_DECAY))(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-    x = Conv2D(64, kernel_size=(3, 3), activation='relu', kernel_regularizer=regularizers.l2(WEIGHT_DECAY))(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-  
+    x = Conv2D(32, kernel_size=(3, 3), activation='relu')(input)
     x = BatchNormalization()(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+
+    x = Conv2D(32, kernel_size=(3, 3), activation='relu')(x)
+    x = BatchNormalization()(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+    x = Dropout(0.25)(x)
+
+
+    x = Conv2D(64, kernel_size=(3, 3), activation='relu')(x)
+    x = BatchNormalization()(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+    x = Dropout(0.25)(x)
+
+
+    x = Flatten() (x)
+    x = Dense(128, kernel_initializer='he_normal', kernel_regularizer=regularizers.l2(WEIGHT_DECAY))(x) # kernel_regularizer=regularizers.l2(WEIGHT_DECAY)
     x = Dropout(0.5)(x)
-    x = Flatten()(x)
-    x = Dense(512, kernel_initializer='he_normal', kernel_regularizer=regularizers.l2(WEIGHT_DECAY))(x) # kernel_regularizer=regularizers.l2(WEIGHT_DECAY)
-    x = BatchNormalization()(x)
-    
     output = ArcFace(NUM_CLASSES, regularizer=regularizers.l2(WEIGHT_DECAY))([x, label]) # regularizer=regularizers.l2(WEIGHT_DECAY)
 
     model = Model([input, label], output)
