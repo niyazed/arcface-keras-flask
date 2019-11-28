@@ -10,6 +10,7 @@ I haven't use any pretrained model. So, full customized model with Arc loss. Any
 ## Usage
 - `$ python main.py` - Start the Flask app in the browser.
 - `$ python face_extract.py` - Extract faces via webcam
+- `$ python num.py` - Make two npy file from extracted faces [Ex. faces.npy, labels.npy]
 - `$ python train.py` - Train the model
 - `$ python mtcnn_detect.py` - Start face recognizer using webcam on OpenCV window
 
