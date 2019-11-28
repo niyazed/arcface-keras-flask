@@ -4,6 +4,27 @@ ArcFace Implementation using keras and Flask deploy
 ## Custom Model
 I haven't use any pretrained model. So, full customized model with Arc loss. Anyone can easily customize their own model.
 
+## Folder/File Structure
+```
++-Faces
+|
++--- [Person1]
+|     |
+|     +--- image1.jpg
+|     +--- image2.jpg
+      ....
+      ....
+|
++--- [Person2]
+|     |
+|     +--- image1.jpg
+|     +--- image2.jpg
+      ....
+      ....
+...
+...
+```
+
 ## Model Architecture
 [Image]
 
